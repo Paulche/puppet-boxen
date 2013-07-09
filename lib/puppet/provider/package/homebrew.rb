@@ -86,6 +86,12 @@ Puppet::Type.type(:package).provide :homebrew,
         run "boxen-install", resource[:name]
       end
 
+      # Some brew package has caveats about `brew linkapps`.
+      check_cmd = ["sudo", "-E", "-u", Facter[:luser].value, "#{self.class.home}/bin/brew", 'info', resource[:name], '|', 'grep linkapps'].flatten.join(' ')
+
+      `#{check_cmd}`
+
+      run "linkapps" if $? == 0
     end
   end
 
